@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .input-transition {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .input-transition:focus {
+            background-color: #4B5563; /* bg-gray-600 */
+            transform: scale(1.05);
+        }
+        .button-transition {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .button-transition:hover {
+            background-color: #047857; /* hover:bg-green-700 */
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .active-tab {
+            background-color: #4B5563; /* bg-gray-600 */
+        }
+        .tab-button {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .tab-button:hover {
+            background-color: #3B4252;
+        }
+        .file-card {
+            background-color: #4B5563;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+        .file-card img, .file-card video {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+        .viewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .viewer img, .viewer video {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .viewer-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f56565;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .upload-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .upload-container input[type="file"] {
+            margin-right: 1rem;
+        }
+        .btn-upload {
+            background-color: #38a169;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        .btn-upload:hover {
+            background-color: #2f855a;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 flex h-screen fade-in">
+    <!-- Sidebar -->
+    <div class="bg-gray-700 w-64 p-6 flex flex-col">
+        <div class="mb-6 text-center">
+            <img src="artworks-zyYqA8D0BdfuyH28-WeeHrw-t500x500.png" alt="Logo" class="mx-auto w-24 h-24 rounded-full">
+        </div>
+        <nav class="flex-1">
+            <ul>
+                <li class="mb-4">
+                    <a href="dashboard.html" class="flex items-center p-2 text-gray-400 hover:bg-gray-600 hover:text-white rounded-md">
+                        <i class="fas fa-tachometer-alt mr-3"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="profile.html" class="flex items-center p-2 text-gray-400 hover:bg-gray-600 hover:text-white rounded-md">
+                        <i class="fas fa-user mr-3"></i>
+                        Profile
+                    </a>
+                </li>
+                <li class="mb-4">
+                    <a href="settings.html" class="flex items-center p-2 text-gray-400 hover:bg-gray-600 hover:text-white rounded-md">
+                        <i class="fas fa-cogs mr-3"></i>
+                        Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="login.html" class="flex items-center p-2 text-gray-400 hover:bg-gray-600 hover:text-white rounded-md">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
+                        Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-gray-700 text-white p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-semibold">Dashboard</h1>
+        </header>
+
+        <!-- Tabs -->
+        <div class="bg-gray-700 p-4 flex text-white">
+            <div onclick="showTab('photos')" id="photos-tab" class="tab-button active-tab">Photos</div>
+            <div onclick="showTab('videos')" id="videos-tab" class="tab-button">Videos</div>
+            <div onclick="showTab('files')" id="files-tab" class="tab-button">Files</div>
+        </div>
+
+        <!-- Tab Contents -->
+        <div id="photos" class="flex-1 p-6">
+            <div class="bg-gray-600 p-4 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4">Photos</h2>
+                <div class="upload-container">
+                    <input type="file" id="photoUpload" class="text-gray-300" accept="image/*">
+                    <button onclick="uploadPhoto()" class="btn-upload">Upload Photo</button>
+                </div>
+                <div id="photoGallery" class="grid grid-cols-3 gap-4">
+                    <!-- Photos will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="videos" class="flex-1 p-6 hidden">
+            <div class="bg-gray-600 p-4 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4">Videos</h2>
+                <div class="upload-container">
+                    <input type="file" id="videoUpload" class="text-gray-300" accept="video/*">
+                    <button onclick="uploadVideo()" class="btn-upload">Upload Video</button>
+                </div>
+                <div id="videoGallery" class="grid grid-cols-3 gap-4">
+                    <!-- Videos will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <div id="files" class="flex-1 p-6 hidden">
+            <div class="bg-gray-600 p-4 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold text-white mb-4">Files</h2>
+                <div class="upload-container">
+                    <input type="file" id="fileUpload" class="text-gray-300">
+                    <button onclick="uploadFile()" class="btn-upload">Upload File</button>
+                </div>
+                <div id="fileGallery" class="grid grid-cols-3 gap-4">
+                    <!-- Files will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="viewer" class="viewer hidden">
+        <div class="viewer-close" onclick="closeViewer()">X</div>
+        <img id="viewerImg" class="hidden">
+        <video id="viewerVideo" controls class="hidden">
+            <source id="viewerVideoSource">
+        </video>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.getElementById('photos').classList.add('hidden');
+            document.getElementById('videos').classList.add('hidden');
+            document.getElementById('files').classList.add('hidden');
+            document.getElementById(tab).classList.remove('hidden');
+
+            document.getElementById('photos-tab').classList.remove('active-tab');
+            document.getElementById('videos-tab').classList.remove('active-tab');
+            document.getElementById('files-tab').classList.remove('active-tab');
+            document.getElementById(tab + '-tab').classList.add('active-tab');
+        }
+
+        function uploadPhoto() {
+            const photoUpload = document.getElementById('photoUpload');
+            if (photoUpload.files.length > 0) {
+                const file = photoUpload.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const photoGallery = document.getElementById('photoGallery');
+                    const div = document.createElement('div');
+                    div.className = 'file-card';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Photo">
+                        <div class="flex">
+                            <button class="bg-blue-600 text-white px-2 py-1 rounded-md button-transition mr-2" onclick="viewImage('${e.target.result}')">View</button>
+                            <button class="bg-red-600 text-white px-2 py-1 rounded-md button-transition mr-2" onclick="this.parentElement.parentElement.remove()">Delete</button>
+                            <a href="${e.target.result}" download="${file.name}" class="bg-green-600 text-white px-2 py-1 rounded-md button-transition">Download</a>
+                        </div>
+                    `;
+                    photoGallery.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadVideo() {
+            const videoUpload = document.getElementById('videoUpload');
+            if (videoUpload.files.length > 0) {
+                const file = videoUpload.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const videoGallery = document.getElementById('videoGallery');
+                    const div = document.createElement('div');
+                    div.className = 'file-card';
+                    div.innerHTML = `
+                        <video class="hidden">
+                            <source src="${e.target.result}" type="video/mp4">
+                        </video>
+                        <div class="flex">
+                            <button class="bg-blue-600 text-white px-2 py-1 rounded-md button-transition mr-2" onclick="viewVideo('${e.target.result}')">View</button>
+                            <button class="bg-red-600 text-white px-2 py-1 rounded-md button-transition mr-2" onclick="this.parentElement.parentElement.remove()">Delete</button>
+                            <a href="${e.target.result}" download="${file.name}" class="bg-green-600 text-white px-2 py-1 rounded-md button-transition">Download</a>
+                        </div>
+                    `;
+                    videoGallery.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function uploadFile() {
+            const fileUpload = document.getElementById('fileUpload');
+            if (fileUpload.files.length > 0) {
+                const file = fileUpload.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileGallery = document.getElementById('fileGallery');
+                    const div = document.createElement('div');
+                    div.className = 'file-card';
+                    div.innerHTML = `
+                        <p>${file.name}</p>
+                        <div class="flex">
+                            <button class="bg-blue-600 text-white px-2 py-1 rounded-md button-transition mr-2">Share</button>
+                            <button class="bg-red-600 text-white px-2 py-1 rounded-md button-transition mr-2" onclick="this.parentElement.parentElement.remove()">Delete</button>
+                            <a href="${e.target.result}" download="${file.name}" class="bg-green-600 text-white px-2 py-1 rounded-md button-transition">Download</a>
+                        </div>
+                    `;
+                    fileGallery.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function viewImage(src) {
+            const viewer = document.getElementById('viewer');
+            const viewerImg = document.getElementById('viewerImg');
+            const viewerVideo = document.getElementById('viewerVideo');
+
+            viewerImg.src = src;
+            viewerImg.classList.remove('hidden');
+            viewerVideo.classList.add('hidden');
+
+            viewer.classList.remove('hidden');
+        }
+
+        function viewVideo(src) {
+            const viewer = document.getElementById('viewer');
+            const viewerImg = document.getElementById('viewerImg');
+            const viewerVideo = document.getElementById('viewerVideo');
+            const viewerVideoSource = document.getElementById('viewerVideoSource');
+
+            viewerVideoSource.src = src;
+            viewerVideo.load();
+            viewerVideo.classList.remove('hidden');
+            viewerImg.classList.add('hidden');
+
+            viewer.classList.remove('hidden');
+        }
+
+        function closeViewer() {
+            document.getElementById('viewer').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
